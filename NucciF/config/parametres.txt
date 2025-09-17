@@ -1,0 +1,98 @@
+﻿
+text(basemode, value,
+	0: Imax,
+	1: Limiting
+	)
+
+text(crange, value,
+	0: crange_hi,
+	1: crange_auto
+	)
+
+text(dmask, mask,
+	1: mask0,
+	2: mask1,
+	8: mask2,
+	16: mask3,
+	32: mask4,
+	64: mask5
+	)
+
+text(OnOff, value,
+	0: Off,
+	1: On
+	)
+
+text(Day, value,
+	0: Sun, 1: Mon, 2: Tue, 3: Wed, 4: Thu, 5: Fri, 6: Sat
+	)
+
+text(unit, value,
+	0: uR,
+	1: uSv
+	)
+
+text(save, value,
+	0: save_nop,
+	1: save_do,
+	2: save_ok,
+	3: save_nothing,
+	4: save_error
+	)
+
+text(reboot, value,
+	0: reboot_no,
+	1: reboot_do,
+	2: reboot_ok
+	)
+
+group(Info, public)
+	p(version_major	,""		,uint16_t	,chmodR		,getFwVer	,0	,0x0000	,0			,0			,65535		,0		,0			,0	,notsave)
+	p(version_minor	,""		,uint16_t	,chmodR		,getFwVer	,1	,0x0001	,0			,0			,65535		,0		,0			,0	,notsave)
+	p(version_patch	,""		,uint16_t	,chmodR		,getFwVer	,2	,0x0002	,0			,0			,65535		,0		,0			,0	,notsave)
+	p(modbus_address,""		,uint16_t	,chmodRW	,nullptr	,0	,0x0003	,1			,0			,65535		,0		,0			,0	,savesys)
+	p(serial_number	,""		,uint32_t	,chmodRW	,nullptr	,0	,0x0004	,0xFFFFFFFF	,0			,0xFFFFFFFF	,0		,0			,0	,savesys)
+
+group(Settings, public)
+	p(timezone		,""		,int8_t		,chmodRW	,nullptr	,0	,0x0100	,-2			,-12		,12			,1		,1			,0	,savesys)
+	p(brightness	,"%"	,uint8_t	,chmodRW	,nullptr	,0	,0x0101	,60			,10			,100		,1		,10			,0	,savesys)
+	p(brightnessTime,"min"	,uint8_t	,chmodRW	,nullptr	,0	,0x0100	,2			,0			,250		,1		,1			,0	,savesys)
+	p(ipadr			,""		,uint32_t	,chmodRW	,nullptr	,0	,0x0100	,0xC0A8010A	,0			,0xFFFFFFFF	,1		,1			,0	,savesys)
+	p(netmask		,""		,uint32_t	,chmodRW	,nullptr	,0	,0x0100	,0xFFFFFF00	,0			,0xFFFFFFFF	,1		,1			,0	,savesys)
+	p(gateway		,""		,uint32_t	,chmodRW	,nullptr	,0	,0x0000	,0xC0A80101	,0			,0xFFFFFFFF	,1		,1			,0	,savesys)
+	p(dstOnOff		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,1			,0			,1			,1		,1			,0	,savesys)
+	p(DSTSMon		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,3			,1			,12			,1		,1			,0	,savesys)
+	p(DSTSWeek		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,5			,1			,5			,1		,1			,0	,savesys)
+	p(DSTSDay		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,6			,1		,1			,0	,savesys)
+	p(DSTSHour		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,2			,0			,23			,1		,1			,0	,savesys)
+	p(DSTSMin		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,59			,1		,1			,0	,savesys)
+	p(DSTSSec		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,59			,1		,1			,0	,savesys)
+	p(DSTEMon		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,10			,1			,12			,1		,1			,0	,savesys)
+	p(DSTEWeek		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,5			,1			,5			,1		,1			,0	,savesys)
+	p(DSTEDay		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,6			,1		,1			,0	,savesys)
+	p(DSTEHour		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,3			,0			,23			,1		,1			,0	,savesys)
+	p(DSTEMin		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,59			,1		,1			,0	,savesys)
+	p(DSTESec		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,59			,1		,1			,0	,savesys)
+	p(rad_unit		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,1			,1		,1			,0	,savesys)
+	p(hsave_settings,""		,uint16_t	,chmodRW	,nullptr	,0	,0x010F	,0			,0			,4			,0		,0			,0	,notsave)
+	p(reboot		,""		,uint16_t	,chmodRW	,nullptr	,0	,0x0111	,2			,0			,2			,0		,0			,0	,notsave)
+	p(beepOnOff		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0112	,1			,0			,1			,0		,1			,0	,notsave)
+
+group(Settings2, private)
+	p(utcTime		,""		,uint32_t	,chmodRW	,nullptr	,0	,0x0000	,0x58684680	,0x58684680	,0xFFFFFFFF	,86400	,1728000	,0	,notsave)
+	p(mac0			,""		,uint64_t	,chmodR		,nullptr	,0	,0x0000	,0			,0			,0xFFFFFFFF	,1		,1			,0	,notsave)
+	p(save_settings	,""		,uint16_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,4			,0		,0			,0	,notsave)
+	p(crange_set	,""		,uint16_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,1			,1		,1			,0	,notsave)
+
+group(Common, public)
+	p(startcnt		,""		,uint32_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,0xFFFFFFFF	,1		,1			,0	,saveuse)
+
+group(Base, public)
+	p(odoPulseCount	,""		,uint32_t	,chmodR		,nullptr	,0	,0x0300	,0			,0			,0xFFFFFFFF	,0		,0			,0	,saveuse)
+	p(pulseCount	,""		,uint32_t	,chmodR		,nullptr	,0	,0x0302	,0			,0			,0xFFFFFFFF	,0		,0			,0	,notsave)
+	p(pulseCountpm	,""		,uint32_t	,chmodR		,nullptr	,0	,0x0304	,0			,0			,0xFFFFFFFF	,0		,0			,0	,notsave)
+	p(countTime		,"s"	,uint32_t	,chmodR		,nullptr	,0	,0x0306	,0			,0			,0xFFFFFFFF	,0		,0			,0	,notsave)
+	p(rad_uR		,"uR"	,uint32_t	,chmodR		,nullptr	,0	,0x0308	,0			,0			,0xFFFFFFFF	,0		,0			,1	,notsave)
+	p(rad_uSv		,"uSv"	,uint32_t	,chmodR		,nullptr	,0	,0x030A	,0			,0			,0xFFFFFFFF	,0		,0			,2	,notsave)
+	p(radVal_uRph	,"uR/h"	,uint32_t	,chmodR		,nullptr	,0	,0x030C	,0			,0			,0xFFFFFFFF	,0		,0			,1	,notsave)
+	p(radVal_uSvph	,"uSv/h",uint32_t	,chmodR		,nullptr	,0	,0x030E	,0			,0			,0xFFFFFFFF	,0		,0			,2	,notsave)

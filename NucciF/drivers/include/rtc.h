@@ -1,0 +1,38 @@
+﻿/*!****************************************************************************
+ * @file		rtc.h
+ * @author		d_el
+ * @version		V1.1
+ * @date		13.02.2018
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @brief		Driver RTC module
+ */
+#ifndef rtc_H
+#define rtc_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*!****************************************************************************
+ * Include
+ */
+#include <time.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+/*!****************************************************************************
+ * Function declaration
+ */
+bool rtc_init(void);
+bool rtc_setTime(const struct tm *t);
+bool rtc_setTimeUnix(time_t time);
+bool rtc_setTimeUnixLocal(time_t time);
+bool rtc_backupWrite(const uint32_t* src, uint8_t dstoffset, size_t len);
+bool rtc_backupRead(uint8_t srcoffset, uint8_t* dst, size_t len);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif //rtc_H
+/******************************** END OF FILE ********************************/
