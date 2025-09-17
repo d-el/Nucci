@@ -47,23 +47,6 @@ PrefsVaultGUID=
 PrefsRevisionGUID=
 
 [Document1]
-DocumentPath=NucciL.OutJob
-AnnotationEnabled=1
-AnnotateStartValue=1
-AnnotationIndexControlEnabled=0
-AnnotateSuffix=
-AnnotateScope=All
-AnnotateOrder=-1
-DoLibraryUpdate=1
-DoDatabaseUpdate=1
-ClassGenCCAutoEnabled=1
-ClassGenCCAutoRoomEnabled=1
-ClassGenNCAutoScope=None
-DItemRevisionGUID=
-GenerateClassCluster=0
-DocumentUniqueId=
-
-[Document2]
 DocumentPath=NucciL.PcbDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -80,7 +63,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=LAVIKWVH
 
-[Document3]
+[Document2]
 DocumentPath=NucciL.PCBDwf
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -97,7 +80,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
 
-[Document4]
+[Document3]
 DocumentPath=NucciL.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -114,8 +97,81 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=BXHEZIMV
 
+[Document4]
+DocumentPath=NucciL.OutJob
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
 [GeneratedDocument1]
-DocumentPath=Project Outputs for ServoOne\Design Rule Check - NucciL.html
+DocumentPath=output\BOM\Bill of Materials-NucciL.xlsx
+DItemRevisionGUID=
+
+[GeneratedDocument2]
+DocumentPath=output\NC Drill\NucciL.DRR
+DItemRevisionGUID=
+
+[GeneratedDocument3]
+DocumentPath=output\Gerber\NucciL.EXTREP
+DItemRevisionGUID=
+
+[GeneratedDocument4]
+DocumentPath=output\Gerber\NucciL.GBL
+DItemRevisionGUID=
+
+[GeneratedDocument5]
+DocumentPath=output\Gerber\NucciL.GBO
+DItemRevisionGUID=
+
+[GeneratedDocument6]
+DocumentPath=output\Gerber\NucciL.GBS
+DItemRevisionGUID=
+
+[GeneratedDocument7]
+DocumentPath=output\Gerber\NucciL.GD1
+DItemRevisionGUID=
+
+[GeneratedDocument8]
+DocumentPath=output\Gerber\NucciL.GKO
+DItemRevisionGUID=
+
+[GeneratedDocument9]
+DocumentPath=output\Gerber\NucciL.GTL
+DItemRevisionGUID=
+
+[GeneratedDocument10]
+DocumentPath=output\Gerber\NucciL.GTO
+DItemRevisionGUID=
+
+[GeneratedDocument11]
+DocumentPath=output\Gerber\NucciL.GTS
+DItemRevisionGUID=
+
+[GeneratedDocument12]
+DocumentPath=output\NC Drill\NucciL.LDP
+DItemRevisionGUID=
+
+[GeneratedDocument13]
+DocumentPath=output\Gerber\NucciL.REP
+DItemRevisionGUID=
+
+[GeneratedDocument14]
+DocumentPath=output\Gerber\NucciL.RUL
+DItemRevisionGUID=
+
+[GeneratedDocument15]
+DocumentPath=output\NC Drill\NucciL.TXT
 DItemRevisionGUID=
 
 [Configuration1]
