@@ -16,53 +16,28 @@ extern "C" {
 /*!****************************************************************************
 * Include
 */
-#include "stdint.h"
-
-/*!****************************************************************************
-* User include
-*/
-
-/*!****************************************************************************
-* User define
-*/
-#define usei2c			(i2c1)
-#define i2ctimeout		(200)	//[ms]
-#define CONTROLCODE		(0xA)
-#define BYTESINPAGE		(256)
-#define BYTESINBLOCK	(16)
-
-/*!****************************************************************************
-* User enum
-*/
-enum{
-	eepWrite = 0,
-	eepRead	 = 1
-};
-
-/*!****************************************************************************
-* User typedef
-*/
-typedef enum{
-	eepOk = 0,
-	eepI2cError,
-	eepOtherError
-}eepStatus_type;
-
-typedef union{
-	struct{
-		uint8_t rw				:1;
-		uint8_t blockSelect		:3;
-		uint8_t controlCode		:4;
-	}bit;
-	uint8_t		all;
-}eepAddress_type;
+#include <stdint.h>
+#include <stddef.h>
 
 /*!****************************************************************************
 * Prototypes for the functions
 */
-void eep_init(void);
-eepStatus_type eep_write(uint16_t dst, void *src, uint16_t len);
-eepStatus_type eep_read(void *dst, uint16_t src, uint16_t len);
+class Eep24AA{
+private:
+	using i2cRead_t = bool (*)(uint8_t devAddr, uint8_t* dst, size_t len, uint16_t timeout);
+	using i2cWrite_t = bool (*)(uint8_t devAddr, const uint8_t* src, size_t len, bool needstop, uint16_t timeout);
+
+public:
+	Eep24AA(i2cRead_t read=nullptr, i2cWrite_t write=nullptr);
+	void setI2c(i2cRead_t read, i2cWrite_t write);
+	void init(void);
+	bool write(uint16_t dst, const void *src, uint16_t len);
+	bool read(void *dst, uint16_t src, uint16_t len);
+
+private:
+	i2cRead_t m_read;
+	i2cWrite_t m_write;
+};
 
 #ifdef __cplusplus
 }

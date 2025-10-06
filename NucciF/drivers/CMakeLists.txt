@@ -1,4 +1,5 @@
 add_library(drivers STATIC
+	src/adc.c
 	src/beep.c
 	src/clock.c
 	src/cm4.c
@@ -6,6 +7,8 @@ add_library(drivers STATIC
 	src/enco.c
 	src/flash.c
 	src/gpio.c
+	src/htimer.c
+	src/hvpwm.c
 	src/i2c.c
 	src/key.c
 	src/ledpwm.c

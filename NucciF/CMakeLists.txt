@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 
 project(Nucci 
-	VERSION 0.0.9
+	VERSION 0.0.10
 	LANGUAGES CXX C
 	)
 
@@ -54,6 +54,7 @@ add_subdirectory(lib/freemodbus)
 add_subdirectory(lib/freertos)
 add_subdirectory(lib/IQmathLib-cm4)
 add_subdirectory(lib/lwip)
+add_subdirectory(math)
 add_subdirectory(net)
 add_subdirectory(portfreemodbus)
 add_subdirectory(prmsystem)

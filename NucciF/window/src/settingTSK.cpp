@@ -42,6 +42,15 @@ ItemState setBeepVol(const MenuItem* m){
 }
 
 /*!****************************************************************************
+ * @brief    set Beep Volume callback
+ */
+ItemState chargerConfig(const MenuItem* m){
+	(void)m;
+	bool result = chargerConfig();
+	return ItemState{ result, "Config Error" };
+}
+
+/*!****************************************************************************
  * @brief    set LCD Bright callback
  */
 ItemState updateDST(const MenuItem* m){
@@ -113,7 +122,16 @@ m3,
 	m33,
 m4,
 m5,
-m6;
+m6,
+m7,
+	m70,
+	m71,
+	m72,
+m8,
+m9,
+	m90,
+	m91,
+	m92;
 
 const MenuItem
 m1("Unit", &Prm::rad_unit, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullptr, nullptr),
@@ -145,7 +163,16 @@ m3("LAN", nullptr, true, 0, nullptr, nullptr, netUpdate, nullptr, &m4, &m2, &m30
 
 m4("Bright", &Prm::brightness, true, 0, setBright, nullptr, nullptr, nullptr, &m5, &m3),
 m5("BrightTime", &Prm::brightnessTime, true, 0, nullptr, nullptr, nullptr, nullptr, &m6, &m4),
-m6("BeepVol", &Prm::beepOnOff, true, 0, setBeepVol, nullptr, nullptr, nullptr, nullptr, &m5);
+m6("BeepVol", &Prm::beepOnOff, true, 0, setBeepVol, nullptr, nullptr, nullptr, &m7, &m5),
+m7("HVC", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m8, &m6, &m70),
+	m70("SetVoltage", &Prm::vhv_set, true, 0, nullptr, nullptr, nullptr, nullptr, &m71, nullptr),
+	m71("MeasVoltage", &Prm::vhv_meas, false, 0, nullptr, nullptr, nullptr, nullptr, &m72, &m70),
+	m72("CalGain", &Prm::vhv_calGain, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m71),
+m8("Reboot", &Prm::reboot, true, 0, nullptr, nullptr, nullptr, nullptr, &m9, &m7),
+m9("PowerManagement", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m8, &m90),
+	m90("BatChargeV", &Prm::ch_chvbat, true, 0, chargerConfig, nullptr, nullptr, nullptr, &m91, nullptr),
+	m91("ChargeI", &Prm::ch_chibat, false, 0, chargerConfig, nullptr, nullptr, nullptr, &m92, &m90),
+	m92("BatULVO", &Prm::vbamMin, true, 0, chargerConfig, nullptr, nullptr, nullptr, nullptr, &m91);
 
 /*!****************************************************************************
  * @brief    Setting system task

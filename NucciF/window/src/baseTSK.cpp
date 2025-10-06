@@ -32,18 +32,17 @@
 #include "footer.h"
 #include <ledpwm.h>
 
-/******************************************************************************
- * Base task
- */
-
 enum {
 	VAR_VOLT = 0,
 	VAR_CURR,
 	VAR_NUMBER
 };
 
-uint16_t valmas[160];
+static uint16_t valmas[160];
 
+/******************************************************************************
+ * Base task
+ */
 void baseTSK(void *pPrm){
 	(void)pPrm;
 	TickType_t xLastWakeTime = xTaskGetTickCount();
@@ -64,7 +63,7 @@ void baseTSK(void *pPrm){
 
 	disp_setColor(black, red);
 	disp_fillScreen(black);
-	//ksSet(30, 5, kUp | kDown);
+	//ksSet(30, 5, 0, 0, 0);
 	enco_settic(3);
 
 	uint8_t vmode = 0;
@@ -136,24 +135,30 @@ void baseTSK(void *pPrm){
 			disp_setColor(black, ui.color.cursor);
 
 			// Level
-			uint32_t uRph = Prm::radVal_uRph.val;
+			auto& radph = Prm::rad_unit.val == Prm::mask_unit::uR ? Prm::radVal_uRph : Prm::radVal_uSvph;
 			if(Prm::countTime.val >= 60){
-				snprintf(str, sizeof(str), "%04" PRIi32 ".%" PRIi32, uRph / 10, uRph % 10);
+				if(Prm::rad_unit.val == Prm::mask_unit::uSv){
+					snprintf(str, sizeof(str), "%03" PRIi32 ".%02" PRIi32, radph.val / 100, radph.val % 100);
+				}else{
+					snprintf(str, sizeof(str), "%04" PRIi32 ".%01" PRIi32, radph.val / 10, radph.val % 10);
+				}
+
 			}else{
-				snprintf(str, sizeof(str), "----.-");
+				snprintf(str, sizeof(str), "----");
 			}
 			disp_putStr(0, 0, &dSegBold, 6, str);
-			disp_putStr(129, 18, &font8x12, 0, "uR/h");
+			disp_putStr(130, 5, &font8x12, 0, Prm::rad_unit.val == Prm::mask_unit::uR ? "uR" : "uSv");
+			disp_putStr(130, 17, &font8x12, 0, "ph");
 
-			//
-			uint32_t uR = Prm::rad_uR.val;
-			if(uR <= 99999){
-				snprintf(str, sizeof(str), "%04" PRIi32 ".%01" PRIi32, uR / 10, uR % 10);
+			auto& rad = Prm::rad_unit.val == Prm::mask_unit::uR ? Prm::rad_uR : Prm::rad_uSv;
+			uint32_t urad = rad.val;
+			if(urad <= 99999){
+				snprintf(str, sizeof(str), "%04" PRIi32 ".%01" PRIi32, urad / 10, urad % 10);
 			}else{
-				snprintf(str, sizeof(str), "%04" PRIi32, uR / 10);
+				snprintf(str, sizeof(str), "%04" PRIi32, urad / 10);
 			}
 			disp_putStr(0, 34, &dSegBold, 6, str);
-			disp_putStr(129, 52, &font8x12, 0, "uR");
+			disp_putStr(130, 51, &font8x12, 0, rad.getunit());
 
 			if(Prm::countTime.val >= 60){
 				snprintf(str, sizeof(str), "CPM: %" PRIu32, Prm::pulseCountpm.val);
@@ -197,6 +202,15 @@ void baseTSK(void *pPrm){
 			}
 
 			disp_keepBackgroundColor(true);
+
+			uint16_t max_y = offset_y + h - valmax / divFactor;
+			max_y = max_y < 0 + font6x8.chars->image->h ? 0 + font6x8.chars->image->h : max_y;
+			max_y = max_y > offset_y + h - font6x8.chars->image->h * 2 ? offset_y + h - font6x8.chars->image->h * 2 : max_y;
+			snprintf(str, sizeof(str), "%u", valmax);
+			disp_putStr(offset_x, max_y, &font6x8, 0, str);
+
+
+			disp_setContentColor(white);
 			snprintf(str, sizeof(str), "%ucpm", h * divFactor);
 			disp_putStr(offset_x, 0, &font6x8, 0, str);
 			snprintf(str, sizeof(str), "0cpm");
@@ -206,9 +220,7 @@ void baseTSK(void *pPrm){
 
 		//Print status bar
 		printFooter();
-
 		disp_flushfill(&ui.color.background);
-
 		//Cyclic delay
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BASE_TSK_PERIOD));
 	}

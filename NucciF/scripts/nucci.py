@@ -84,6 +84,8 @@ class Panel:
 
     sn = property(lambda self: self.modbus.read_i32(0x0004, self.slaveaddr), None)
 
+    reboot = property(lambda self: self.modbus.read_u16(0x0111, self.slaveaddr),
+                        lambda self, val: self.modbus.write_u16(0x0111, val, self.slaveaddr))
     odoPulseCount = property(lambda self: self.modbus.read_u32(0x0300, self.slaveaddr), None)
     pulseCount = property(lambda self: self.modbus.read_u32(0x0302, self.slaveaddr), None)
     pulseCountpm = property(lambda self: self.modbus.read_u32(0x0304, self.slaveaddr), None)
@@ -120,6 +122,7 @@ if __name__ == '__main__':
     ap.add_argument('-i', '--ipaddr', required=True, help='Device IP address')
     ap.add_argument("-p", "--fwpanel", required=False, help="Firmware panel file")
     ap.add_argument('-w', help='Wait', action='store_true')
+    ap.add_argument("--reboot", required=False, help='Reboot device', action='store_true')
     args = ap.parse_args()
 
     ps = Ps3604l(args.ipaddr)
@@ -132,6 +135,10 @@ if __name__ == '__main__':
             quit()
         ps.panel.updateFw(args.fwpanel)
         time.sleep(1)
+        raise SystemExit
+    
+    if args.reboot:
+        ps.panel.reboot = 1
         raise SystemExit
 
     while True:

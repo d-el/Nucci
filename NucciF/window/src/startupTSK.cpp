@@ -42,7 +42,7 @@ void startupTSK(void *pPrm){
 
 		disp_setColor(black, white);
 		disp_fillScreen(black);
-		disp_PrintImageMonochrome((DISP_W - ImageLogo.w) / 2, 3, &ImageLogo);  //Logo
+		disp_PrintImageMonochrome((DISP_W - ImageLogo.w) / 2, 0, &ImageLogo);  //Logo
 
 		char str[64];
 		sprintf(str, "P%s", getVersion());
@@ -90,11 +90,7 @@ void startupTSK(void *pPrm){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
 		}
 
-//		if(keyState(kMode)){
-//			selWindow(settingWindow);
-//		}else{
-			selWindow(baseWindow);
-//		}
+		selWindow(baseWindow);
 	}
 }
 

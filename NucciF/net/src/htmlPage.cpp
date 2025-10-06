@@ -100,7 +100,7 @@ const uint8_t getUrlNumber = sizeof(httpResource) / sizeof(httpResource[0]);
  */
 urlData_type handle_statemeastask(void){
 	static urlData_type urlData;
-	bin_statemeastask.tubeVoltage = 391;
+	bin_statemeastask.tubeVoltage = Prm::vhv_meas.val;
 	bin_statemeastask.countTime = Prm::countTime.val;
 	bin_statemeastask.radVal_uRph = Prm::radVal_uRph.val;
 	bin_statemeastask.rad_uR = Prm::rad_uR.val;

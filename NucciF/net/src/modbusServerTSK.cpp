@@ -24,7 +24,7 @@ void modbusServerTSK(void *pPrm){
 
 	while(1){
 		eMBPoll();
-		vTaskDelay(1);
+		vTaskDelay(2);
 	}
 }
 

@@ -115,6 +115,8 @@ typedef enum{
 
 /*14*/GP_MCO1,
 /*15*/GP_MCO2,
+/*16*/GP_IN_CNT,
+/*17*/GP_POWER_ON,
 
 GP_NOT_USED
 }GPnum_type;

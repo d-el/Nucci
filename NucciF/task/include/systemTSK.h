@@ -70,6 +70,7 @@ void timezoneUpdate(int8_t timezone);
 void OSinit(void);
 void saveparametersSystem(void);
 void saveparametersUser(void);
+bool chargerConfig(void);
 
 void meter_clear(void);
 

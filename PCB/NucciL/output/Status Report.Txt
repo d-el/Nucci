@@ -1,0 +1,10 @@
+Output: Bill of Materials
+Type  : BOM
+From  : Project [NucciL.PrjPcb]
+   Generated File[Bill of Materials-NucciL.xlsx]
+
+
+Files Generated   : 1
+Documents Printed : 0
+
+Finished Output Generation At 14:07:40 On 9/16/2025

@@ -2,8 +2,8 @@
  * @file		systemTSK.c
  * @author		d_el
  * @version		V1.0
- * @date		14.09.2015
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @date		04.10.2025
+ * @copyright	The MIT License (MIT). Copyright (c) 2025 Storozhenko Roman
  * @brief		System control task
  */
 
@@ -27,6 +27,7 @@
 #include <beep.h>
 #include <rtc.h>
 #include <pvd.h>
+#include <i2c.h>
 #include <ledpwm.h>
 #include <board.h>
 #include <ui.h>
@@ -35,11 +36,16 @@
 #include <baseTSK.h>
 #include <monitorTSK.h>
 #include <24AAxx.h>
+#include <rt9466.h>
+#include <adcTSK.h>
 #include "systemTSK.h"
 #include <write.h>
 #include "httpServerTSK.h"
 #include "radmonClient.h"
 #include <modbusServerTSK.h>
+#include <specificMath.h>
+
+#include <semphr.h>
 
 /*!****************************************************************************
  * Memory
@@ -47,16 +53,19 @@
 frontPanel_type fp;					///< Data structure front panel
 static TaskHandle_t windowTskHandle;	///< Program task handler
 static struct netif xnetif; 			///< Network interface structure
+static Eep24AA eep24AA08;
+static Rt9466 rt9466;
 static SemaphoreHandle_t lowPowerSem;
 static TickType_t countTime;
 static uint32_t sparkOffset;
 static uint16_t cnt[60];
+static bool rt9466reconfig = true;
 
 /*!****************************************************************************
  * Local prototypes for the functions
  */
 static void loadParameters(void);
-static void pvdCallback(void);
+static void shutdown(void);
 static void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gateway);
 extern "C" int _write(int fd, const void *buf, size_t count);
 
@@ -94,6 +103,72 @@ void meter_clear(void){
 	}
 }
 
+uint8_t chargerStatus;
+void ch_stat(){
+	Rt9466::ch_status_t ch_status;
+	if(rt9466.get_status(&ch_status)){
+		chargerStatus = ch_status.chg_stat;
+	}
+
+	rt9466.adc_start(Rt9466::adc_ch::VBAT);
+	vTaskDelay(20);
+	uint16_t bat_adc = 0;
+	if(rt9466.adc_read(&bat_adc)){
+		//const char* ch_stat_str[4] = { "ready", "in_progress", "charge_done", "fault" };
+		Prm::ch_vbatMeas.val = (bat_adc * 5) / 10;
+		//P_LOGI(logTag, "ch: stat %s, V %umV", ch_stat_str[ch_status.chg_stat], Prm::ch_vbatMeas.val);
+	}
+
+//	rt9466.adc_start(Rt9466::adc_ch::IBAT);
+//	vTaskDelay(200);
+//	uint16_t ibat = 0;
+//	rt9466.adc_read(&ibat);
+//	rt9466.get_status(&ch_status);
+//	P_LOGI(logTag, "sys %u mA", (ibat * 50 * 63) / 100);
+
+	if(rt9466reconfig){
+		bool result = rt9466.batteryRegulationVoltageSet(Prm::ch_chvbat.val);
+		result = result && rt9466.chargingRegulationCurrentSet(Prm::ch_chibat.val);
+		rt9466reconfig = false;
+	}
+}
+
+void setupI2Cdevices(void){
+	static SemaphoreHandle_t i2cTcSem;
+	vSemaphoreCreateBinary(i2cTcSem);
+	xSemaphoreTake(i2cTcSem, portMAX_DELAY);
+	assert(i2cTcSem != NULL);
+
+	auto i2cTxHook = [](i2c_type* i2c){
+		(void)i2c;
+		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+		xSemaphoreGiveFromISR(i2cTcSem, &xHigherPriorityTaskWoken);
+		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+	};
+
+	auto i2cRead = [](uint8_t devAddr, uint8_t* dst, size_t len, uint16_t timeout){
+		//P_LOGI(logTag, "i2c_read %u", len);
+		i2c_read(i2c1, dst, len, devAddr);
+		return pdTRUE == xSemaphoreTake(i2cTcSem, pdMS_TO_TICKS(timeout));
+	};
+
+	auto i2cWrite = [](uint8_t devAddr, const uint8_t* src, size_t len, bool needstop, uint16_t timeout){
+		//P_LOGI(logTag, "i2c_write %u", len);
+		i2c_write(i2c1, src, len, devAddr, needstop ? i2cNeedStop : i2cWithoutStop);
+		return pdTRUE == xSemaphoreTake(i2cTcSem, pdMS_TO_TICKS(timeout));
+	};
+
+	i2c_init(i2c1);
+	i2c_setCallback(i2c1, i2cTxHook);
+
+	eep24AA08.setI2c(i2cRead, i2cWrite);
+	rt9466.setI2c(i2cRead, i2cWrite);
+
+	rt9466.init();
+	Rt9466::ch_status_t ch_status;
+	rt9466.get_status(&ch_status);
+}
+
 /*!****************************************************************************
  * @brief
  */
@@ -107,10 +182,11 @@ void systemTSK(void *pPrm){
 
 	P_LOGI(logTag, "\n\nStarted systemTSK");
 
+	setupI2Cdevices();
 	loadParameters();												// Load panel settings and user parameters
 	timezoneUpdate(Prm::timezone.val);
-	pvd_setSupplyFaultCallBack(pvdCallback);						// Setup callback for Supply Fault
 	disp_init();
+	ETH_BSP_Config();			//Configure Ethernet (GPIOs, clocks, MAC, DMA)
 	LwIP_Init(Prm::ipadr.val, Prm::netmask.val, Prm::gateway.val);	// Initialize the LwIP stack
 	uint64_t mac = 0;
 	memcpy(&mac, xnetif.hwaddr, xnetif.hwaddr_len);
@@ -123,7 +199,11 @@ void systemTSK(void *pPrm){
 	lowPowerSem = xSemaphoreCreateBinary();
 	assert(lowPowerSem != NULL);
 
-	BaseType_t osres = xTaskCreate(radmonClientTSK, "radmonTSK", RADMON_TSK_SZ_STACK, NULL, RADMON_TSK_PRIO, NULL);
+	BaseType_t osres = xTaskCreate(adcTSK, "adcTSK", ADC_TSK_SZ_STACK, NULL, ADC_TSK_PRIO, NULL);
+	assert(osres == pdTRUE);
+	P_LOGI(logTag, "Started adcTSK");
+
+	osres = xTaskCreate(radmonClientTSK, "radmonTSK", RADMON_TSK_SZ_STACK, NULL, RADMON_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started radmonClientTSK");
 
@@ -144,6 +224,7 @@ void systemTSK(void *pPrm){
 	osres = pdTRUE;
 	uint32_t odoPulseCountPrev = Prm::odoPulseCount.val;
 	selWindow(startupWindow);
+	TickType_t batStat_time = 0;
 	while(1){
 		Prm::pulseCount.val = Prm::odoPulseCount.val - sparkOffset;
 		if(Prm::odoPulseCount.val - odoPulseCountPrev > 100){
@@ -157,15 +238,15 @@ void systemTSK(void *pPrm){
 		}
 		Prm::pulseCountpm.val = cpm;
 		Prm::radVal_uRph.val = (cpm * 10 * 60/*min in hour*/ * 10) / 3624;
+		Prm::radVal_uSvph.val = (cpm * 10 * 60/*min in hour*/) / 3624;
 
 		Prm::rad_uR.val = Prm::pulseCount.val * 100 / 3624;
+		Prm::rad_uSv.val = Prm::pulseCount.val * 10 / 3624;
 
 		if(xTaskGetTickCount() - countTime >= 1000){
 			countTime += 1000;
 			Prm::countTime.val++;
 		}
-
-		bool regulatorConnected = /*reg_getState(&state)*/ false;
 
 		if(selWindowPrev != fp.currentSelWindow){
 			if(windowTskHandle != NULL){
@@ -206,7 +287,7 @@ void systemTSK(void *pPrm){
 		if(ledCount == 20){
 			LED_OFF();
 		}
-		if((ledCount == 40) && regulatorConnected){
+		if((ledCount == 40) && false){
 			LED_ON();
 		}
 		if(ledCount == 60){
@@ -217,6 +298,13 @@ void systemTSK(void *pPrm){
 		if(linkRequest != httpServer.numberRequest){
 			fp.state.httpactiv = 1;
 			linkRequest = httpServer.numberRequest;
+		}
+
+		if(batStat_time < xTaskGetTickCount()){
+			batStat_time = xTaskGetTickCount() + 200;
+			ch_stat();
+			adcTaskStct.targetcurrentlsb = s32iq_lerp(0, 0, 390, Prm::vhv_calGain.val, Prm::vhv_set.val);
+			Prm::vhv_meas.val = s32iq_lerp(0, 0, Prm::vhv_calGain.val, 390, adcTaskStct.filtered.vhv);
 		}
 
 		if(Prm::reboot.val == Prm::mask_reboot::reboot_do){
@@ -234,9 +322,9 @@ void systemTSK(void *pPrm){
 static void loadParameters(void){
 	size_t size = Prm::getSerialSize(Prm::Save::savesys);
 	if(size){
-		uint8_t buffer[size];
+		uint8_t buffer[size] = {1,2,3};
 		const uint16_t systemSettingsAddress = 0;
-		if(eep_read(buffer, systemSettingsAddress, size) == eepOk){
+		if(eep24AA08.read(buffer, systemSettingsAddress, size)){
 			if(!Prm::deserialize(Prm::Save::savesys, buffer, size)){
 				P_LOGW(logTag, "System settings load error");
 				fp.state.sysSettingLoadDefault = 1;
@@ -247,8 +335,6 @@ static void loadParameters(void){
 	size = Prm::getSerialSize(Prm::Save::saveuse);
 	if(size){
 		uint8_t buffer[size];
-//		const uint16_t userSettingsAddress = 512;
-		//if(eep_read(buffer, userSettingsAddress, size) == eepOk){
 		if(rtc_backupRead(0, buffer, size)){
 			if(!Prm::deserialize(Prm::Save::saveuse, buffer, size)){
 				P_LOGW(logTag, "User settings load error");
@@ -267,7 +353,10 @@ void saveparametersSystem(void){
 	if(size){
 		uint8_t buffer[size];
 		Prm::serialize(Prm::Save::savesys, buffer);
-		eep_write(systemSettingsAddress, buffer, size);
+		if(!eep24AA08.write(systemSettingsAddress, buffer, size)){
+			P_LOGW(logTag, "saveparametersSystem, error save data");
+		}
+
 	}
 }
 
@@ -275,28 +364,30 @@ void saveparametersSystem(void){
  * @brief	Save parameters to memory
  */
 void saveparametersUser(void){
-//	const uint16_t userSettingsAddress = 512;
 	size_t size = Prm::getSerialSize(Prm::Save::saveuse);
 	if(size){
 		uint8_t buffer[size];
 		Prm::serialize(Prm::Save::saveuse, buffer);
-		//eep_write(userSettingsAddress, buffer, size);
 		rtc_backupWrite((uint32_t*)buffer, 0, (size + 3) / 4);
 	}
 }
 
 /*!****************************************************************************
+ * @brief
+ */
+bool chargerConfig(void){
+	rt9466reconfig = true;
+	return true;
+}
+
+/*!****************************************************************************
  * Shutdown
  */
-static void pvdCallback(void){
+static void shutdown(void){
 	setLcdBrightness(0);
 	LED_OFF();
 	ETH_BSP_Deinit();
-	//saveparametersUser();
-
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-	xSemaphoreGiveFromISR(lowPowerSem, &xHigherPriorityTaskWoken);
-	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+	NVIC_SystemReset();
 }
 
 /*!****************************************************************************

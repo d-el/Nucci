@@ -75,7 +75,7 @@ group(Settings, public)
 	p(DSTESec		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,59			,1		,1			,0	,savesys)
 	p(rad_unit		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,1			,1		,1			,0	,savesys)
 	p(hsave_settings,""		,uint16_t	,chmodRW	,nullptr	,0	,0x010F	,0			,0			,4			,0		,0			,0	,notsave)
-	p(reboot		,""		,uint16_t	,chmodRW	,nullptr	,0	,0x0111	,2			,0			,2			,0		,0			,0	,notsave)
+	p(reboot		,""		,uint16_t	,chmodRW	,nullptr	,0	,0x0111	,2			,0			,2			,1		,1			,0	,notsave)
 	p(beepOnOff		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0112	,1			,0			,1			,0		,1			,0	,notsave)
 
 group(Settings2, private)
@@ -96,3 +96,14 @@ group(Base, public)
 	p(rad_uSv		,"uSv"	,uint32_t	,chmodR		,nullptr	,0	,0x030A	,0			,0			,0xFFFFFFFF	,0		,0			,2	,notsave)
 	p(radVal_uRph	,"uR/h"	,uint32_t	,chmodR		,nullptr	,0	,0x030C	,0			,0			,0xFFFFFFFF	,0		,0			,1	,notsave)
 	p(radVal_uSvph	,"uSv/h",uint32_t	,chmodR		,nullptr	,0	,0x030E	,0			,0			,0xFFFFFFFF	,0		,0			,2	,notsave)
+
+	p(vhv_set		,"V"	,uint16_t	,chmodR		,nullptr	,0	,0x030F	,350		,75			,450		,1		,1			,0	,savesys)
+	p(vhv_meas		,"V"	,uint16_t	,chmodR		,nullptr	,0	,0x0310	,0			,0			,0xFFFF		,0		,0			,0	,savesys)
+	p(vhv_calGain	,""		,uint16_t	,chmodR		,nullptr	,0	,0x0310	,1788		,0			,0xFFFF		,0		,0			,0	,savesys)
+
+	p(ch_vbatMeas	,"V"	,uint16_t	,chmodR		,nullptr	,0	,0x0310	,0			,0			,655.35		,0		,0			,2	,savesys)
+	p(ch_chvbat		,"V"	,uint16_t	,chmodR		,nullptr	,0	,0x0310	,4.20		,3.90		,4.3		,0.01	,0.01		,2	,savesys)
+	p(ch_chibat		,"A"	,uint8_t	,chmodR		,nullptr	,0	,0x0310	,0.5		,0.1		,5.0		,0.1	,0.1		,1	,savesys)
+	p(vbamMin		,"V"	,uint8_t	,chmodR		,nullptr	,0	,0x0310	,2.7		,2.0		,3.9		,0.1	,0.1		,1	,savesys)
+
+

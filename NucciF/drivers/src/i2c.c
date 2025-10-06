@@ -114,8 +114,8 @@ void i2c_init(i2c_type *i2cx){
 	i2cx->pI2c->CR2 |= I2C_CR2_LAST;
 	i2cx->pI2c->CR2 |= I2C_CLOCK / 1000000;
 
-	i2cx->pI2c->CCR	|= I2C_CCR_FS;								   //Fast Mode I2C
-	i2cx->pI2c->CCR	|= I2C_CCR_DUTY;							   //Fast Mode tlow/thigh = 16/9 (see CCR)
+	i2cx->pI2c->CCR	|= I2C_CCR_FS;									//Fast Mode I2C
+	i2cx->pI2c->CCR	|= I2C_CCR_DUTY;								//Fast Mode tlow/thigh = 16/9 (see CCR)
 	i2cx->pI2c->CCR	|= I2C_CLOCK / (i2cx->clockSpeed * 25U);
 	i2cx->pI2c->TRISE |= (I2C_CLOCK / 300000U) + 1U;
 
@@ -168,7 +168,7 @@ void i2c_setCallback(i2c_type *i2cx, i2cCallback_type tcHook){
 /******************************************************************************
  *
  */
-void i2c_write(i2c_type *i2cx, void *src, uint16_t len, uint8_t slaveAdr, i2c_stopMode_type stopMode){
+void i2c_write(i2c_type *i2cx, const void *src, uint16_t len, uint8_t slaveAdr, i2c_stopMode_type stopMode){
 	i2cx->pDmaStreamTx->CR		&= ~DMA_SxCR_EN;
 	i2cx->pDmaStreamTx->M0AR	= (uint32_t)src;
 	i2cx->pDmaStreamTx->NDTR	= len;

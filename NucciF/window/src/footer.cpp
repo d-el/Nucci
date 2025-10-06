@@ -31,17 +31,22 @@
  * @brief
  */
 void printFooter(void){
-	static char str[30];
+	char str[36];
 
 	//Print line
 	grf_line(0, 107, 159, 107, halfLightGray);
 
 	disp_setColor(black, white);
 
-	snprintf(str, sizeof(str), "Vsns %" PRIu32 "V", 379ul);
+	char vstr[16];
+	Prm::ch_vbatMeas.tostring(vstr, sizeof(vstr));
+	snprintf(str, sizeof(str), "VBAT %sV", vstr);
 	disp_putStr(0, 110, &font6x8, 0, str);
 
-	snprintf(str, sizeof(str), "CP   %09" PRIu32, Prm::odoPulseCount.val);
+	//snprintf(str, sizeof(str), "CP   %09" PRIu32, Prm::odoPulseCount.val);
+	//disp_putStr(0, 120, &font6x8, 0, str);
+
+	snprintf(str, sizeof(str), "VHV  %03" PRIu16 "V", Prm::vhv_meas.val);
 	disp_putStr(0, 120, &font6x8, 0, str);
 
 	//Print time
@@ -73,12 +78,12 @@ void printFooter(void){
 		}
 
 		snprintf(str, sizeof(str), "LAN");
-		disp_putStr(60, 110, &font6x8, 0, str);
+		disp_putStr(63, 110, &font6x8, 0, str);
 	}
-	else{
-		snprintf(str, sizeof(str), "    ");
-		disp_putStr(69, 110, &font6x8, 0, str);
-	}
+
+	extern uint8_t chargerStatus;
+	snprintf(str, sizeof(str), "CHS %u", chargerStatus);
+	disp_putStr(63, 120, &font6x8, 0, str);
 }
 
 /******************************** END OF FILE ********************************/

@@ -9,7 +9,6 @@
 /*!****************************************************************************
  * Include
  */
-#include "i2c.h"
 #include "pvd.h"
 #include "stm32f4x7_eth_bsp.h"
 #include "beep.h"
@@ -24,7 +23,8 @@
 #include "rng.h"
 #include "systemTSK.h"
 #include "uniqueDeviceId.h"
-#include "24AAxx.h"
+#include "i2c.h"
+#include "htimer.h"
 
 /*!****************************************************************************
  * MCU peripheral initialization
@@ -36,10 +36,9 @@ void hardInit(void){
 	}else{
 		fp.state.mainOscillatorError = 1;
 	}
+	htimer_init();
 	gpio_init();
-	ETH_BSP_Config();			//Configure Ethernet (GPIOs, clocks, MAC, DMA)
 	sysTimeMeasEnable();
-	enco_init();
 	beep_init();
 	ledPwm_init();
 	if(rtc_init()){
@@ -47,10 +46,8 @@ void hardInit(void){
 	}else{
 		fp.state.rtcOscillatorError = 1;
 	}
-	i2c_init(i2c1);
 	rng_init();
-	eep_init();
-	pvd_init();
+	//pvd_init();
 }
 
 /******************************** END OF FILE ********************************/

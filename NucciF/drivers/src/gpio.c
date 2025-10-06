@@ -39,7 +39,8 @@ const pinMode_type pinsMode[] = {
 
 /*14*/makepin(GPIOA, 8,		alternateFunctionPushPull, pullDisable, 0, 0),	//MCO1
 /*15*/makepin(GPIOC, 9,		alternateFunctionPushPull, pullDisable, 0, 0),	//MCO2
-/*16*/makepin(GPIOA, 10,	digitalInput,	pullDisable,			0, 0),	//IN_CNT
+/*16*/makepin(GPIOA, 5,		digitalInput,	pullDisable,			0, 0),	//IN_CNT
+/*17*/makepin(GPIOA, 3,		outOpenDrain,	pullDisable,			0, 0),	//POWER_ON
 
 };
 const uint32_t pinNum = sizeof(pinsMode) / sizeof(pinMode_type);
@@ -141,13 +142,13 @@ void gppin_init(GPIO_TypeDef *port, uint8_t npin, gpioMode_type mode, gpioPull_t
  */
 void gppin_initCntInt(gppin_callback_t cb){
 	cntIntcb = cb;
-	EXTI_INIT(GPIOA, 10, EXTI_MODE_RISE, 15);
+	EXTI_INIT(GPIOA, 5, EXTI_MODE_RISE, 15);
 //	SYSCFG->EXTICR[3] |= 0 << SYSCFG_EXTICR3_EXTI10_Pos;
 //	EXTI_IMR
 }
 
-void EXTI15_10_IRQHandler(void){
-	EXTI->PR = 1 << 10;
+void EXTI9_5_IRQHandler(void){
+	EXTI->PR = 1 << 5;
 	cntIntcb();
 }
 

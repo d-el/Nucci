@@ -32,7 +32,7 @@ extern "C" {
 #define		I2C1_RxDmaInterruptPrior	(15)
 #define		I2C1_TxDmaInterruptPrior	(15)
 #define		I2C1_PINAF					(4)
-#define		I2C1_ClockFreg				(400000)	//[Hz]
+#define		I2C1_ClockFreg				(100000)	//[Hz]
 
 //I2C2
 #define		I2C2_USE					(0)
@@ -78,8 +78,8 @@ typedef enum{
 }i2cState_type;
 
 typedef enum{
-    i2cNeedStop,
-    i2cWithoutStop
+	i2cNeedStop,
+	i2cWithoutStop
 }i2c_stopMode_type;
 
 typedef struct i2cStruct{
@@ -119,7 +119,7 @@ extern i2c_type		   *i2c1;
 void i2c_init(i2c_type *i2cx);
 void i2c_reInit(i2c_type *i2cx);
 void i2c_setCallback(i2c_type *i2cx, i2cCallback_type tcHook);
-void i2c_write(i2c_type *i2cx, void *src, uint16_t len, uint8_t slaveAdr, i2c_stopMode_type stopMode);
+void i2c_write(i2c_type *i2cx, const void *src, uint16_t len, uint8_t slaveAdr, i2c_stopMode_type stopMode);
 void i2c_read(i2c_type *i2cx, void *dst, uint16_t len, uint8_t slaveAdr);
 
 #ifdef __cplusplus

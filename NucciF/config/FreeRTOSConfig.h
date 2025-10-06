@@ -119,6 +119,7 @@ unsigned long vGetTimerForRunTimeStats(void);
 
 /*!**** NAME ****************** priority [1 - configMAX_PRIORITIES] **********/
 #define SYSTEM_TSK_PRIO			8
+#define ADC_TSK_PRIO			7
 #define NETIF_TSK_PRIO			6
 #define TCPIP_TSK_PRIO			5
 #define TCPMODBUS_TSK_PRIO		4
@@ -132,6 +133,7 @@ unsigned long vGetTimerForRunTimeStats(void);
 
 /*!**** NAME ****************** size [4byte Word] ****************************/
 #define SYSTEM_TSK_SZ_STACK		512
+#define ADC_TSK_SZ_STACK		512
 #define NETIF_SZ_STACK			512
 #define TCPIP_SZ_STACK			512
 #define TCPMODBUS_TSK_SZ_STACK	512
