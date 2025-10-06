@@ -25,8 +25,8 @@
  * MEMORY
  */
 static const char* radmonHost = "radmon.org";
-static const char* userName = "*****";
-static const char* userPass = "*****";
+static const char* userName = "d_el";
+static const char* userPass = "del_2718";
 #define LOG_LOCAL_LEVEL P_LOG_WARN
 static const char *logTag = "radMon";
 char buffer[256];

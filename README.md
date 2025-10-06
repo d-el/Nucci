@@ -17,10 +17,13 @@ The detector tube voltage is set from the menu in the range of 100-450V.
 
 Assembly:
 <img src="Photo/combo.JPEG" style="width:400px;" />
+
 PCB top:
 <img src="Photo/pcb_top.JPEG" style="width:400px;" />
+
 PCB bottom:
 <img src="Photo/pcb_bot.JPEG" style="width:400px;" />
+
 SBT10 connector:
 <img src="Photo/sbt_connector.JPEG" style="width:400px;" />
 
