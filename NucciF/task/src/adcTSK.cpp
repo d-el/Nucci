@@ -111,7 +111,7 @@ void adcTSK(void *pPrm){
 
 	auto pwmUpdateHandler = [](){ // PWM interrupt handler
 		tsigma = modulator(tpwm);
-		hvPwm_set(tsigma);
+		hvPwm_set(a.hvEnable ? tsigma : 0);
 	};
 
 	hvPwm_UpdateCallbackSet(pwmUpdateHandler);

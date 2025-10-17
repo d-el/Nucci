@@ -21,7 +21,8 @@ typedef struct {
 	}filtered;
 	uint16_t		vhvoffset;
 	uint16_t		targetcurrentlsb;
-	bool 			overload;
+	bool			overload;
+	bool			hvEnable;
 } adcTaskStct_type;
 
 /*!****************************************************************************

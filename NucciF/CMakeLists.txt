@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 
 project(Nucci 
-	VERSION 0.0.10
+	VERSION 0.0.12
 	LANGUAGES CXX C
 	)
 

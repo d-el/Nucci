@@ -33,7 +33,7 @@ void hvPwm_init(void){
 	tim3->PSC = 1 - 1;										// Set prescaler
 	TIM3->CCER |= TIM_CCER_CC1E;							// Channel enable
 	TIM3->CCMR1 |= TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1;		// PWM mode
-	TIM3->ARR = 10000;										// Auto-reload value
+	TIM3->ARR = 20000;										// Auto-reload value
 	TIM3->CCR1 = 0;											// Compare value
 	TIM3->CR1 |= TIM_CR1_ARPE;								// TIMx_ARR register is buffered
 	TIM3->CR2 |= TIM_CR2_MMS_1;								// Update - The update event is selected as trigger output (TRGO)

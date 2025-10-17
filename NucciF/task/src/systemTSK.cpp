@@ -305,6 +305,7 @@ void systemTSK(void *pPrm){
 			ch_stat();
 			adcTaskStct.targetcurrentlsb = s32iq_lerp(0, 0, 390, Prm::vhv_calGain.val, Prm::vhv_set.val);
 			Prm::vhv_meas.val = s32iq_lerp(0, 0, Prm::vhv_calGain.val, 390, adcTaskStct.filtered.vhv);
+			adcTaskStct.hvEnable = true; //Prm::rad_unit.val != 0;
 		}
 
 		if(Prm::reboot.val == Prm::mask_reboot::reboot_do){
