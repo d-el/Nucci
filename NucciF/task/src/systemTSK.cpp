@@ -103,6 +103,9 @@ void meter_clear(void){
 	}
 }
 
+/*!****************************************************************************
+ * @brief
+ */
 uint8_t chargerStatus;
 void ch_stat(){
 	Rt9466::ch_status_t ch_status;
@@ -119,13 +122,6 @@ void ch_stat(){
 		//P_LOGI(logTag, "ch: stat %s, V %umV", ch_stat_str[ch_status.chg_stat], Prm::ch_vbatMeas.val);
 	}
 
-//	rt9466.adc_start(Rt9466::adc_ch::IBAT);
-//	vTaskDelay(200);
-//	uint16_t ibat = 0;
-//	rt9466.adc_read(&ibat);
-//	rt9466.get_status(&ch_status);
-//	P_LOGI(logTag, "sys %u mA", (ibat * 50 * 63) / 100);
-
 	if(rt9466reconfig){
 		bool result = rt9466.batteryRegulationVoltageSet(Prm::ch_chvbat.val);
 		result = result && rt9466.chargingRegulationCurrentSet(Prm::ch_chibat.val);
@@ -133,6 +129,9 @@ void ch_stat(){
 	}
 }
 
+/*!****************************************************************************
+ * @brief
+ */
 void setupI2Cdevices(void){
 	static SemaphoreHandle_t i2cTcSem;
 	vSemaphoreCreateBinary(i2cTcSem);
@@ -306,6 +305,10 @@ void systemTSK(void *pPrm){
 			adcTaskStct.targetcurrentlsb = s32iq_lerp(0, 0, 390, Prm::vhv_calGain.val, Prm::vhv_set.val);
 			Prm::vhv_meas.val = s32iq_lerp(0, 0, Prm::vhv_calGain.val, 390, adcTaskStct.filtered.vhv);
 			adcTaskStct.hvEnable = true; //Prm::rad_unit.val != 0;
+
+			if(Prm::ch_vbatMeas.val != 0 && Prm::ch_vbatMeas.val < Prm::vbamMin.val * 10){
+				shutdown();
+			}
 		}
 
 		if(Prm::reboot.val == Prm::mask_reboot::reboot_do){
