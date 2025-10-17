@@ -97,6 +97,9 @@ ItemState netUpdate(const MenuItem* m){
 
 extern const MenuItem
 m1,
+	m10,
+	m11,
+	m12,
 m2,
 	m20,
 	m21,
@@ -121,21 +124,20 @@ m3,
 	m32,
 	m33,
 m4,
+	m40,
+	m41,
+	m42,
 m5,
 m6,
 m7,
-	m70,
-	m71,
-	m72,
 m8,
-m9,
-	m90,
-	m91,
-	m92;
+m9;
 
 const MenuItem
-m1("Unit", &Prm::rad_unit, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullptr, nullptr),
-
+m1("HVC", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullptr, &m10),
+	m10("SetVoltage", &Prm::vhv_set, true, 0, nullptr, nullptr, nullptr, nullptr, &m11, nullptr),
+	m11("MeasVoltage", &Prm::vhv_meas, false, 0, nullptr, nullptr, nullptr, nullptr, &m12, &m10),
+	m12("CalGain", &Prm::vhv_calGain, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m11),
 m2("Date&Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, &m20),
 	m20("Clock", &Prm::utcTime, true, 0, nullptr, rtcSelect, rtcUnselect, nullptr, &m21, nullptr, nullptr, clockEditor),
 	m21("Time Zone", &Prm::timezone, true, 0, nullptr, nullptr, nullptr, nullptr, &m22, &m20),
@@ -154,25 +156,20 @@ m2("Date&Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, 
 		m243("Hour", &Prm::DSTEHour, true, 0, nullptr, nullptr, nullptr, nullptr, &m244, &m242),
 		m244("Min", &Prm::DSTEMin, true, 0, nullptr, nullptr, nullptr, nullptr, &m245, &m243),
 		m245("Sec", &Prm::DSTESec, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m244),
-
 m3("LAN", nullptr, true, 0, nullptr, nullptr, netUpdate, nullptr, &m4, &m2, &m30),
 	m30("IP address", &Prm::ipadr, true, 0, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, nullptr, ipAddressEditor),
 	m31("subnet mask", &Prm::netmask, true, 0, nullptr, nullptr, nullptr, nullptr, &m32, &m30, nullptr, ipAddressEditor),
 	m32("gateway", &Prm::gateway, true, 0, nullptr, nullptr, nullptr, nullptr, &m33, &m31, nullptr, ipAddressEditor),
 	m33("MAC", &Prm::mac0, false, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m32, nullptr, ipMacEditor),
-
-m4("Bright", &Prm::brightness, true, 0, setBright, nullptr, nullptr, nullptr, &m5, &m3),
-m5("BrightTime", &Prm::brightnessTime, true, 0, nullptr, nullptr, nullptr, nullptr, &m6, &m4),
-m6("BeepVol", &Prm::beepOnOff, true, 0, setBeepVol, nullptr, nullptr, nullptr, &m7, &m5),
-m7("HVC", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m8, &m6, &m70),
-	m70("SetVoltage", &Prm::vhv_set, true, 0, nullptr, nullptr, nullptr, nullptr, &m71, nullptr),
-	m71("MeasVoltage", &Prm::vhv_meas, false, 0, nullptr, nullptr, nullptr, nullptr, &m72, &m70),
-	m72("CalGain", &Prm::vhv_calGain, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m71),
-m8("Reboot", &Prm::reboot, true, 0, nullptr, nullptr, nullptr, nullptr, &m9, &m7),
-m9("PowerManagement", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m8, &m90),
-	m90("BatChargeV", &Prm::ch_chvbat, true, 0, chargerConfig, nullptr, nullptr, nullptr, &m91, nullptr),
-	m91("ChargeI", &Prm::ch_chibat, false, 0, chargerConfig, nullptr, nullptr, nullptr, &m92, &m90),
-	m92("BatULVO", &Prm::vbamMin, true, 0, chargerConfig, nullptr, nullptr, nullptr, nullptr, &m91);
+m4("PowerManagement", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m5, &m3, &m40),
+	m40("BatChargeV", &Prm::ch_chvbat, true, 0, chargerConfig, nullptr, nullptr, nullptr, &m41, nullptr),
+	m41("ChargeI", &Prm::ch_chibat, false, 0, chargerConfig, nullptr, nullptr, nullptr, &m42, &m40),
+	m42("BatULVO", &Prm::vbamMin, true, 0, chargerConfig, nullptr, nullptr, nullptr, nullptr, &m41),
+m5("Unit", &Prm::rad_unit, true, 0, nullptr, nullptr, nullptr, nullptr, &m6, &m4),
+m6("Bright", &Prm::brightness, true, 0, setBright, nullptr, nullptr, nullptr, &m7, &m5),
+m7("BrightTime", &Prm::brightnessTime, true, 0, nullptr, nullptr, nullptr, nullptr, &m8, &m6),
+m8("BeepVol", &Prm::beepOnOff, true, 0, setBeepVol, nullptr, nullptr, nullptr, &m9, &m7),
+m9("Reboot", &Prm::reboot, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m8);
 
 /*!****************************************************************************
  * @brief    Setting system task
