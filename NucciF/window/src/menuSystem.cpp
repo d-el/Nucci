@@ -223,8 +223,7 @@ bool run(const MenuItem *m){
 	bool change = false;
 	disp_setColor(black, white);
 	disp_fillScreen(black);
-	ksSet(15, 2, 0/*kUp | kDown*/, 20, kFunc | kNext | kDown);
-	//enco_settic(3);
+	ksSet(20, 2, 0, 15, kFunc | kDown);
 
 	while(1){
 		change = false;
@@ -249,6 +248,9 @@ bool run(const MenuItem *m){
 				if(m->previous){
 					callUnselect(m);
 					m = m->previous;
+					if(m->prm){
+
+					}
 					callSelect(m);
 				}
 			}
@@ -263,10 +265,8 @@ bool run(const MenuItem *m){
 			//Parent
 			if(keyStateLong(kFunc)){
 				if(historyIndex){
-					//callExit(m);
 					m = history[--historyIndex];
 					for(top = m; top->previous; top = top->previous);
-					//callEnter(m);
 					callExit(m);
 				}
 				else{
@@ -276,6 +276,7 @@ bool run(const MenuItem *m){
 			//Child
 			if(keyStateLong(kDown)){
 				if(m->editor){
+					keyWaitUnpress(kUp | kDown);
 					callEnter(m);
 					history[historyIndex++] = m;
 					m->editor(history, historyIndex);
@@ -283,6 +284,7 @@ bool run(const MenuItem *m){
 					historyIndex--;
 				}
 				else if(m->child){
+					keyWaitUnpress(kUp | kDown);
 					if(callEnter(m)){
 						history[historyIndex++] = m;
 						m = m->child;

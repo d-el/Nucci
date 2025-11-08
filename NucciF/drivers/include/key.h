@@ -45,11 +45,12 @@ typedef struct {
 	uint32_t keyState;
 	uint32_t longPrevState;
 	uint32_t longState;
-	uint32_t reiterationSelect;
+	uint32_t repeatKeyMask;
 	uint32_t longKeyMask;
-	uint8_t toFirstReiteration;
-	uint8_t toReiteration;
-	uint32_t toLongCnt;
+	uint32_t lockKeyMask;
+	uint8_t toFirstRepeat;
+	uint8_t repeat2repeat;
+	uint32_t toLong;
 	uint8_t dInFilterCnt[KEY_NUM];
 	uint8_t toFirstReiterationCnt[KEY_NUM];
 	uint8_t toReiterationCnt[KEY_NUM];
@@ -68,10 +69,10 @@ uint32_t keyProc(void);
 uint32_t keyState(kKey_type keyMask);
 uint32_t keyStateLong(kKey_type keyMask);
 uint32_t keyDin(kKey_type keyMask);
-void ksSet(uint16_t toFirstReiteration, uint16_t toReiteration, uint16_t reiterationKeyMask, uint16_t toLongCnt, uint16_t longKeyMask);
-void keyAddReiteration(uint16_t reiterationKeyMask);
-void keyClearReiteration(uint16_t reiterationKeyMask);
-
+void ksSet(uint16_t toFirstReiteration, uint16_t toReiteration, uint32_t reiterationKeyMask, uint16_t toLongCnt, uint32_t longKeyMask);
+void keyAddReiteration(uint32_t reiterationKeyMask);
+void keyClearReiteration(uint32_t reiterationKeyMask);
+void keyWaitUnpress(uint32_t mask);
 #ifdef __cplusplus
 }
 #endif

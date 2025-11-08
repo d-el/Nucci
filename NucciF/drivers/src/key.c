@@ -56,19 +56,29 @@ uint32_t keyProc(void){
 
 	//Detect signal front
 	for(mask = 1 << 0; mask < (1 << KEY_NUM); mask <<= 1){
+		if((pkey->dInState & mask) == 0){
+			pkey->lockKeyMask &= ~mask;
+		}
+		if(pkey->lockKeyMask & mask){
+			key.keyState &= ~mask;
+			key.longState &= ~mask;
+			continue;
+		}
+
+		// Key state
 		if(((pkey->dInPrevState & mask) == 0) && ((pkey->dInState & mask) != 0)){
 			pkey->keyState |= mask;
 		}else{
 			pkey->keyState &= ~mask;
 		}
 
-		//Reiteration
-		if((pkey->reiterationSelect & mask) != 0){
+		// Key repeat
+		if((pkey->repeatKeyMask & mask) != 0){
 			if((pkey->dInState & mask) != 0){
-				if(pkey->toFirstReiterationCnt[iterator] < pkey->toFirstReiteration){
+				if(pkey->toFirstReiterationCnt[iterator] < pkey->toFirstRepeat){
 					pkey->toFirstReiterationCnt[iterator]++;
 				}else{
-					if(pkey->toReiterationCnt[iterator] < pkey->toReiteration){
+					if(pkey->toReiterationCnt[iterator] < pkey->repeat2repeat){
 						pkey->toReiterationCnt[iterator]++;
 					}else{
 						pkey->keyState |= mask;
@@ -81,9 +91,10 @@ uint32_t keyProc(void){
 			}
 		}
 
+		// Key long
 		if((pkey->longKeyMask & mask) != 0){
 			if((pkey->dInState & mask) != 0){
-				if(pkey->longCnt[iterator] < pkey->toLongCnt){
+				if(pkey->longCnt[iterator] < pkey->toLong){
 					pkey->longCnt[iterator]++;
 				}else{
 					if((pkey->longPrevState & mask) == 0){
@@ -103,9 +114,8 @@ uint32_t keyProc(void){
 		iterator++;
 	}
 	pkey->dInPrevState = pkey->dInState;
-	//pkey->longPrevState = pkey->longState;
 
-	return pkey->keyState | pkey->longState << 8;
+	return pkey->keyState | pkey->longState;
 }
 
 /*!****************************************************************************
@@ -142,24 +152,35 @@ uint32_t keyDin(kKey_type keyMask){
 }
 
 /*!****************************************************************************
- * @param toFirstReiteration
- * @param toReiteration
- * @param autoPress
+ * @param
  */
-void ksSet(uint16_t toFirstReiteration, uint16_t toReiteration, uint16_t reiterationKeyMask, uint16_t toLongCnt, uint16_t longKeyMask){
-	key.toFirstReiteration = toFirstReiteration;
-	key.toReiteration = toReiteration;
-	key.reiterationSelect = reiterationKeyMask;
-	key.toLongCnt = toLongCnt;
+void ksSet(uint16_t toFirstRepeat, uint16_t repeat2repeat, uint32_t repeatKeyMask, uint16_t toLong, uint32_t longKeyMask){
+	key.toFirstRepeat = toFirstRepeat;
+	key.repeat2repeat = repeat2repeat;
+	key.repeatKeyMask = repeatKeyMask;
+	key.toLong = toLong;
 	key.longKeyMask = longKeyMask;
 }
 
-void keyAddReiteration(uint16_t reiterationKeyMask){
-	key.reiterationSelect = reiterationKeyMask;
+/*!****************************************************************************
+ * @param
+ */
+void keyAddReiteration(uint32_t repeatKeyMask){
+	key.repeatKeyMask = repeatKeyMask;
 }
 
-void keyClearReiteration(uint16_t reiterationKeyMask){
-	key.reiterationSelect &= ~reiterationKeyMask;
+/*!****************************************************************************
+ * @param
+ */
+void keyClearReiteration(uint32_t repeatKeyMask){
+	key.repeatKeyMask &= ~repeatKeyMask;
+}
+
+/*!****************************************************************************
+ * @param
+ */
+void keyWaitUnpress(uint32_t mask){
+	key.lockKeyMask = mask;
 }
 
 /******************************** END OF FILE ********************************/

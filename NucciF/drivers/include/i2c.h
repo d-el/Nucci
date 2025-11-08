@@ -32,7 +32,7 @@ extern "C" {
 #define		I2C1_RxDmaInterruptPrior	(15)
 #define		I2C1_TxDmaInterruptPrior	(15)
 #define		I2C1_PINAF					(4)
-#define		I2C1_ClockFreg				(100000)	//[Hz]
+#define		I2C1_ClockFreg				(400000)	//[Hz]
 
 //I2C2
 #define		I2C2_USE					(0)
